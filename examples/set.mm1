@@ -130,6 +130,10 @@ theorem and_assocr : $ (a /\ (b /\ c)) -> (a /\ b /\ c) $ = '(iand (iand anl (sy
 theorem and_assocri (h: $ a /\ (b /\ c) $) : $ a /\ b /\ c $ = '(ax_mp and_assocr h);
 theorem and_com12 : $ a /\ (b /\ c) -> b /\ (a /\ c) $ = '(syl and_assoc (syl (anim1i ancom) and_assocr));
 theorem and_com23 : $ a /\ b /\ c -> a /\ c /\ b $ = '(syl (syl ancom and_com12) (and_assoc));
+theorem and_ax2 : $ (a -> b /\ c) -> (a -> b) /\ (a -> c) $ = '(iand (imim2i anl) (imim2i anr));
+theorem and_ax2r : $ (a -> b) /\ (a -> c) -> (a -> b /\ c) $ = '(com12 (animd mpcom mpcom));
+theorem expde : $ (a /\ b -> c) -> (a -> b -> c) $ = '(exp (exp (mpd (syl anr and_assoc) anll)));
+theorem expder : $ (a -> b -> c) -> (a /\ b -> c) $ = '(exp (mpd anrr (mpd anrl anl)));
 
 def iff (a b: wff): wff = $ (a -> b) /\ (b -> a) $; infixl iff: $<->$ prec 20;
 
@@ -249,42 +253,39 @@ theorem aneq1da (h: $ G /\ c -> (a <-> b) $): $ G -> (a /\ c <-> b /\ c) $ = '(s
 theorem aneq2da (h: $ G /\ a -> (b <-> c) $): $ G -> (a /\ b <-> a /\ c) $ = '(syl aneq2a (exp h));
 theorem anlass: $ a /\ (b /\ c) <-> b /\ (a /\ c) $ = '(ibii and_com12 and_com12);
 theorem anrass: $ a /\ b /\ c <-> a /\ c /\ b $ = '(ibii and_com23 and_com23);
-theorem an4: $ (a /\ b) /\ (c /\ d) <-> (a /\ c) /\ (b /\ d) $ = '();
-theorem anroti (h: $ a -> b /\ d $): $ a /\ c -> b /\ c /\ d $ = '();
-theorem anrotri (h: $ b /\ d -> a $): $ b /\ c /\ d -> a /\ c $ = '();
-theorem bian11i (h: $ a <-> b /\ c $): $ a /\ d <-> b /\ (c /\ d) $ = '();
-theorem bian21i (h: $ a <-> b /\ c $): $ a /\ d <-> (b /\ d) /\ c $ = '();
-theorem bian12i (h: $ a <-> b /\ c $): $ d /\ a <-> b /\ (d /\ c) $ = '();
-theorem bian22i (h: $ a <-> b /\ c $): $ d /\ a <-> (d /\ b) /\ c $ = '();
-theorem bian11d (h: $ G -> (a <-> b /\ c) $): $ G -> (a /\ d <-> b /\ (c /\ d)) $ = '();
-theorem bian21d (h: $ G -> (a <-> b /\ c) $): $ G -> (a /\ d <-> (b /\ d) /\ c) $ = '();
-theorem bian12d (h: $ G -> (a <-> b /\ c) $): $ G -> (d /\ a <-> b /\ (d /\ c)) $ = '();
-theorem bian22d (h: $ G -> (a <-> b /\ c) $): $ G -> (d /\ a <-> (d /\ b) /\ c) $ = '();
-theorem bian11da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (a /\ d <-> b /\ (c /\ d)) $ = '();
-theorem bian21da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (a /\ d <-> (b /\ d) /\ c) $ = '();
-theorem bian12da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (d /\ a <-> b /\ (d /\ c)) $ = '();
-theorem bian22da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (d /\ a <-> (d /\ b) /\ c) $ = '();
-theorem anidm: $ a /\ a <-> a $ = '();
-theorem anandi: $ a /\ (b /\ c) <-> (a /\ b) /\ (a /\ c) $ = '();
-theorem anandir: $ (a /\ b) /\ c <-> (a /\ c) /\ (b /\ c) $ = '();
-theorem imandi: $ (a -> b /\ c) <-> (a -> b) /\ (a -> c) $ =
-'();
-theorem imancom: $ a /\ (b -> c) -> b -> a /\ c $ = '();
-theorem rbida (h1: $ a /\ c -> b $) (h2: $ a /\ d -> b $)
-  (h: $ a /\ b -> (c <-> d) $): $ a -> (c <-> d) $ =
-'();
+theorem an4: $ (a /\ b) /\ (c /\ d) <-> (a /\ c) /\ (b /\ d) $ = '(ax_mp (ax_mp bitr4 anass) (bitrii anass (aneq2i anlass)));
+theorem anroti (h: $ a -> b /\ d $): $ a /\ c -> b /\ c /\ d $ = '(syl and_com23 (anim1i h));
+theorem anrotri (h: $ b /\ d -> a $): $ b /\ c /\ d -> a /\ c $ = '(syl (anim1i h) and_com23);
+theorem bian11i (h: $ a <-> b /\ c $): $ a /\ d <-> b /\ (c /\ d) $ = '(bitrii (aneq1i h) anass);
+theorem bian21i (h: $ a <-> b /\ c $): $ a /\ d <-> (b /\ d) /\ c $ = '(bitrii (aneq1i h) anrass);
+theorem bian12i (h: $ a <-> b /\ c $): $ d /\ a <-> b /\ (d /\ c) $ = '(bitr3gi (ancomb) (aneq2i ancomb) (bian11i h));
+theorem bian22i (h: $ a <-> b /\ c $): $ d /\ a <-> (d /\ b) /\ c $ = '(bitrii (aneq2i h) (bicomi anass));
+theorem bian11d (h: $ G -> (a <-> b /\ c) $): $ G -> (a /\ d <-> b /\ (c /\ d)) $ = '(syl6bb anass (aneq1d h));
+theorem bian21d (h: $ G -> (a <-> b /\ c) $): $ G -> (a /\ d <-> (b /\ d) /\ c) $ = '(syl6bb anrass (aneq1d h));
+theorem bian12d (h: $ G -> (a <-> b /\ c) $): $ G -> (d /\ a <-> b /\ (d /\ c)) $ = '(syl6bb anlass (aneq2d h));
+theorem bian22d (h: $ G -> (a <-> b /\ c) $): $ G -> (d /\ a <-> (d /\ b) /\ c) $ = '(syl6bb (bicomi anass) (aneq2d h));
+theorem bian11da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (a /\ d <-> b /\ (c /\ d)) $ = '(syl6bb anass (aneq1da h));
+theorem bian21da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (a /\ d <-> (b /\ d) /\ c) $ = '(syl6bb anrass (aneq1da h));
+theorem bian12da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (d /\ a <-> b /\ (d /\ c)) $ = '(syl6bb anlass (aneq2da h));
+theorem bian22da (h: $ G /\ d -> (a <-> b /\ c) $): $ G -> (d /\ a <-> (d /\ b) /\ c) $ = '(syl6bb (bicomi anass) (aneq2da h));
+theorem anidm: $ a /\ a <-> a $ = '(ibii anl (iand id id));
+theorem anandi: $ a /\ (b /\ c) <-> (a /\ b) /\ (a /\ c) $ = '(bitrii (aneq1i (bicomi anidm)) an4);
+theorem anandir: $ (a /\ b) /\ c <-> (a /\ c) /\ (b /\ c) $ = '(bitrii (aneq2i (bicomi anidm)) an4);
+theorem imandi: $ (a -> b /\ c) <-> (a -> b) /\ (a -> c) $ = '(ibii and_ax2 and_ax2r);
+theorem imancom: $ a /\ (b -> c) -> b -> a /\ c $ = '(com12 (animd idd mpcom));
+theorem rbida (h1: $ a /\ c -> b $) (h2: $ a /\ d -> b $) (h: $ a /\ b -> (c <-> d) $): $ a -> (c <-> d) $ =
+'(bitr3d (syla bian2a h1) (bitrd (syla aneq1a h) (syla bian2a h2)));
 theorem rbid (h1: $ b -> a $) (h2: $ c -> a $) (h: $ a -> (b <-> c) $): $ b <-> c $ =
-'();
+'(ax_mp (ax_mp bitr3 (ax_mp bian2a h1)) (ax_mp (ax_mp bitr (ax_mp aneq1a h)) (ax_mp bian2a h2)));
 theorem bieqd
   (h1: $ a -> (b <-> c) $) (h2: $ a -> (d <-> e) $): $ a -> ((b <-> d) <-> (c <-> e)) $ =
-'();
-theorem bieq1d (h: $ a -> (b <-> c) $): $ a -> ((b <-> d) <-> (c <-> d)) $ = '();
-theorem bieq2d (h: $ a -> (c <-> d) $): $ a -> ((b <-> c) <-> (b <-> d)) $ = '();
-theorem bieq: $ (a <-> b) -> (c <-> d) -> ((a <-> c) <-> (b <-> d)) $ = '();
-theorem bieq1: $ (a <-> b) -> ((a <-> c) <-> (b <-> c)) $ = '();
-theorem bieq2: $ (b <-> c) -> ((a <-> b) <-> (a <-> c)) $ = '();
-theorem impexp: $ (a /\ b -> c) <-> (a -> b -> c) $ =
-'();
-theorem impd (h: $ a -> b -> c -> d $): $ a -> b /\ c -> d $ = '();
-theorem expd (h: $ a -> b /\ c -> d $): $ a -> b -> c -> d $ = '();
-theorem com12b: $ (a -> b -> c) <-> (b -> a -> c) $ = '();
+'(aneqd (imeqd h1 h2) (imeqd h2 h1));
+theorem bieq1d (h: $ a -> (b <-> c) $): $ a -> ((b <-> d) <-> (c <-> d)) $ = '(bieqd h biidd);
+theorem bieq2d (h: $ a -> (c <-> d) $): $ a -> ((b <-> c) <-> (b <-> d)) $ = '(bieqd biidd h);
+theorem bieq: $ (a <-> b) -> (c <-> d) -> ((a <-> c) <-> (b <-> d)) $ = '(exp (bieqd anl anr));
+theorem bieq1: $ (a <-> b) -> ((a <-> c) <-> (b <-> c)) $ = '(bieqd id biidd);
+theorem bieq2: $ (b <-> c) -> ((a <-> b) <-> (a <-> c)) $ = '(bieqd biidd id);
+theorem impexp: $ (a /\ b -> c) <-> (a -> b -> c) $ = '(ibii expde expder);
+theorem impd (h: $ a -> b -> c -> d $): $ a -> b /\ c -> d $ = '(syl expder h);
+theorem expd (h: $ a -> b /\ c -> d $): $ a -> b -> c -> d $ = '(syl expde h);
+theorem com12b: $ (a -> b -> c) <-> (b -> a -> c) $ = '(ibii (com23 id) (com23 id));
