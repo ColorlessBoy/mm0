@@ -36,8 +36,7 @@ theorem absurdr: $ a -> ~a -> b $ = '(com12 absurd);
 theorem imim1: $ (a -> b) -> (b -> c) -> (a -> c) $ = '(com12 imim2);
 theorem imim1i (h: $ a -> b $): $ (b -> c) -> (a -> c) $ = '(ax_mp imim1 h);
 theorem imim1d (h: $ a -> b -> c $): $ a -> (c -> d) -> (b -> d) $ = '(syl imim1 h);
-theorem imimd (h1: $ a -> b -> c $) (h2: $ a -> d -> e $):
-  $ a -> (c -> d) -> (b -> e) $ = '(syld (imim1d h1) (imim2d h2));
+theorem imimd (h1: $ a -> b -> c $) (h2: $ a -> d -> e $): $ a -> (c -> d) -> (b -> e) $ = '(syld (imim1d h1) (imim2d h2));
 theorem imim: $ (a -> b) -> (c -> d) -> (b -> c) -> (a -> d) $ = '(syl5 (imim2) (imim2d imim1));
 theorem imimii (h1: $ a -> b $) (h2: $ c -> d $) : $(b -> c) -> (a -> d)$ = '(ax_mp (ax_mp imim h1) h2);
 theorem imidm: $ (a -> a -> b) -> a -> b $ = '(a2i mpcom);
@@ -112,6 +111,7 @@ theorem anim1i (h: $a -> b$): $ a /\ c -> b /\ c $ = '(ax_mp anim1 h);
 theorem anim2: $ (b -> c) -> a /\ b -> a /\ c $ = '(animd idd id);
 theorem anim2i (h: $b -> c$): $ a /\ b -> a /\ c $ = '(ax_mp anim2 h);
 theorem anim: $ (a -> b) -> (c -> d) -> a /\ c -> b /\ d $ = '(com23 (syl6 (com12 anim2) anim1));
+theorem animii (h1: $ a -> b $) (h2: $ c -> d $): $ a /\ c -> b /\ d $ = '(ax_mp (ax_mp anim h1) h2);
 theorem anim2a: $ (a -> b -> c) -> (a /\ b -> a /\ c) $ = '(con3d (syl ax2 (imim2i con3)));
 theorem anim2ai (h : $ a -> b -> c $) : $a /\ b -> a /\ c $ = '(ax_mp anim2a h);
 theorem ancom: $ a /\ b -> b /\ a $ = '(con3i con2);
@@ -245,6 +245,7 @@ theorem imeq2da (h: $ G /\ a -> (b <-> c) $): $ G -> (a -> b <-> a -> c) $ = '(s
 theorem aneq1d (h: $ a -> (b <-> c) $): $ a -> (b /\ d <-> c /\ d) $ = '(aneqd h biidd);
 theorem aneq2d (h: $ a -> (c <-> d) $): $ a -> (b /\ c <-> b /\ d) $ = '(aneqd biidd h);
 theorem aneq: $ (a <-> b) -> (c <-> d) -> (a /\ c <-> b /\ d) $ = '(exp (aneqd anl anr));
+theorem aneqii (h1: $ a <-> b $) (h2: $ c <-> d$): $ a /\ c <-> b /\ d $ = '(ax_mp (ax_mp aneq h1) h2);
 theorem aneq1i (h: $ a <-> b $): $ a /\ c <-> b /\ c $ = '(ax_mp (ax_mp aneq h) biid);
 theorem aneq2i (h: $ b <-> c $): $ a /\ b <-> a /\ c $ = '(ax_mp (ax_mp aneq biid) h);
 theorem aneq2a: $ (a -> (b <-> c)) -> (a /\ b <-> a /\ c) $ = '(syl noteq (syl imeq2a (imim2i noteq)));
@@ -289,3 +290,92 @@ theorem impexp: $ (a /\ b -> c) <-> (a -> b -> c) $ = '(ibii expde expder);
 theorem impd (h: $ a -> b -> c -> d $): $ a -> b /\ c -> d $ = '(syl expder h);
 theorem expd (h: $ a -> b /\ c -> d $): $ a -> b -> c -> d $ = '(syl expde h);
 theorem com12b: $ (a -> b -> c) <-> (b -> a -> c) $ = '(ibii (com23 id) (com23 id));
+
+
+def or (a b: wff): wff = $ ~a -> b $; infixl or: $\/$ prec 30;
+
+theorem orl: $ a -> a \/ b $ = '(absurdr);
+theorem orr: $ b -> a \/ b $ = '(ax1);
+theorem eori (h1: $ a -> c $) (h2: $ b -> c $): $ a \/ b -> c $ = '(casesd (a1i h1) (imim2i h2));
+theorem eord (h1: $ a -> b -> d $) (h2: $ a -> c -> d $): $ a -> b \/ c -> d $ = '(com12 (eori (com12 h1) (com12 h2)));
+theorem eorda (h1: $ a /\ b -> d $) (h2: $ a /\ c -> d $): $ a -> b \/ c -> d $ = '(eord (exp h1) (exp h2));
+theorem orld (h: $ a -> b $): $ a -> b \/ c $ = '(syl orl h);
+theorem orrd (h: $ a -> c $): $ a -> b \/ c $ = '(syl orr h);
+theorem eor: $ (a -> c) -> (b -> c) -> a \/ b -> c $ = '(exp (eord anl anr));
+theorem orimd (h1: $ a -> b -> c $) (h2: $ a -> d -> e $): $ a -> b \/ d -> c \/ e $ = '(imimd (con3d h1) h2);
+theorem orim1d (h: $ a -> b -> c $): $ a -> b \/ d -> c \/ d $ = '(imim1d (con3d h));
+theorem orim2d (h: $ a -> c -> d $): $ a -> b \/ c -> b \/ d $ = '(imim2d h);
+theorem orim1: $ (a -> b) -> a \/ c -> b \/ c $ = '(imim1d con3);
+theorem orim2: $ (b -> c) -> a \/ b -> a \/ c $ = '(imim2d id);
+theorem oreq1i (h: $ a <-> b $): $ a \/ c <-> b \/ c $ = '(imeq1i (noteqi h));
+theorem oreq2i (h: $ b <-> c $): $ a \/ b <-> a \/ c $ = '(imeq2i h);
+theorem orim: $ (a -> b) -> (c -> d) -> a \/ c -> b \/ d $ = '(syl imim con3);
+theorem oreqi (h1: $ a <-> b $) (h2: $ c <-> d $): $ a \/ c <-> b \/ d $ = '(imeqi (noteqi h1) h2);
+theorem oreqid (h1: $ a -> (b <-> c) $) (h2: $ a -> (d <-> e) $): $ a -> (b \/ d <-> c \/ e) $ = 
+'(ibid (orimd (bi1d h1) (bi1d h2)) (orimd (bi2d h1) (bi2d h2)));
+theorem orcom: $ a \/ b -> b \/ a $ = '(con1);
+theorem orcomb: $ a \/ b <-> b \/ a $ = '(con1bi);
+theorem or12: $ a \/ (b \/ c) <-> b \/ (a \/ c) $ = '(com12b);
+theorem orass: $ a \/ b \/ c <-> a \/ (b \/ c) $ = '(bitrii con1bi (bitrii com12b (oreq2i con1bi)));
+theorem or4: $ (a \/ b) \/ (c \/ d) <-> (a \/ c) \/ (b \/ d) $ = '(bitrii orass (bitrii (imeq2i or12) (bicomi orass)));
+theorem oridm: $ a \/ a <-> a $ = '(ibii contra absurdr);
+theorem notan2: $ ~(a /\ b) <-> a -> ~b $ = '(bitrii (bicomi notnot) biid);
+theorem notan: $ ~(a /\ b) <-> (~a \/ ~b) $ = '(bitrii (bicomi notnot) (imeq1i notnot));
+theorem notor: $ ~(a \/ b) <-> (~a /\ ~b) $ = '(ax_mp con3b (imeq2i notnot));
+theorem iman: $ a -> b <-> ~(a /\ ~b) $ = '(bitrii (imeq2i notnot) notnot);
+theorem imorim: $((a \/ b) -> c) -> (a -> c) /\ (b -> c)$ = '(iand (imim1i orl) (imim1i orr));
+theorem imorimr: $ (a -> c) /\ (b -> c) -> ((a \/ b) -> c)$ = '(imp_and eor);
+theorem imor: $ ((a \/ b) -> c) <-> ((a -> c) /\ (b -> c)) $ = '(ibii imorim imorimr);
+theorem andi: $ a /\ (b \/ c) <-> a /\ b \/ a /\ c $ = '(ibii (imp_and (orimd ian ian)) (eori (anim2i orl) (anim2i orr)));
+theorem andir: $ (a \/ b) /\ c <-> a /\ c \/ b /\ c $ = '(bitrii ancomb (bitrii andi (oreqi ancomb ancomb)));
+theorem ordi: $ a \/ (b /\ c) <-> (a \/ b) /\ (a \/ c) $ = '(ibii (eori (iand orl orl) (animii orr orr)) and_ax2r);
+theorem ordir: $ (a /\ b) \/ c <-> (a \/ c) /\ (b \/ c) $ = '(bitrii orcomb (bitrii ordi (aneqii orcomb orcomb)));
+theorem oreq2a: $ (a \/ (b <-> c)) -> (a \/ b <-> a \/ c) $ = '(imeq2a);
+theorem oreq1a: $ (c \/ (a <-> b)) -> (a \/ c <-> b \/ c) $ = '(syl imeq1a (imim2i con3b));
+theorem biim1a: $ (a \/ b) -> (a -> b <-> b) $ = '(ibid (exp (casesd anr anl)) (a1i ax1));
+theorem biim2a: $ (b -> ~a) -> (a -> b <-> ~a) $ = '(ibid (exp (casesd anl (syl con3 anr))) (a1i absurd));
+theorem bior1a: $ (a -> b) -> (a \/ b <-> b) $ = '(ibid (exp (casesd anl anr)) (a1i orr));
+theorem bior2a: $ (b -> a) -> (a \/ b <-> a) $ = '(ibid (exp (casesd anl (syl con1 anr))) (a1i absurdr));
+theorem biim1: $ a -> (a -> b <-> b) $ = '(ibid mpcom (a1i ax1));
+theorem biim2: $ ~b -> (a -> b <-> ~a) $ = '(ibid (com12 con3) (a1i absurd));
+theorem bior1: $ ~a -> (a \/ b <-> b) $ = '(ibid mpcom (a1i ax1));
+theorem bior2: $ ~b -> (a \/ b <-> a) $ = '(ibid (com12 con1) (a1i absurdr));
+theorem em: $ p \/ ~p $ = '(id);
+theorem emr: $ ~p \/ p $ = '(dne);
+
+
+--| Selection: `ifp p a b` is equivalent to `a` if `p` is true,
+--| and equivalent to `b` if `p` is false.
+def ifp (p a b: wff): wff = $ p /\ a \/ ~p /\ b $;
+
+theorem ifppos (p a b: wff): $ p -> (ifp p a b <-> a) $ = '(bitrd (syl bior2 (con2i anl)) bian1);
+theorem ifpneg (p a b: wff): $ ~p -> (ifp p a b <-> b) $ = '(bitrd (syl (bior1) (con3i anl)) bian1);
+theorem ifpid: $ ifp p a a <-> a $ = '(cases ifppos ifpneg);
+theorem ifpnot: $ ifp (~p) a b <-> ifp p b a $ = '(bitrii (oreq2i (aneq1i (bicomi notnot))) orcomb);
+theorem ifpan1: $ ifp p a b /\ c <-> ifp p (a /\ c) (b /\ c) $ = '(bitrii andir (oreqi anass anass));
+theorem ifpan2: $ c /\ ifp p a b <-> ifp p (c /\ a) (c /\ b) $ = '(bitrii andi (oreqi anlass anlass));
+theorem ifpor: $ ifp p (a \/ b) (c \/ d) <-> ifp p a c \/ ifp p b d $ = '(bitrii (oreqi andi andi) or4);
+theorem ifpeq2a: $ (p -> (a1 <-> a2)) -> (ifp p a1 b <-> ifp p a2 b) $ = '(syl oreq1a (syl orr aneq2a));
+theorem ifpeq3a: $ (~p -> (b1 <-> b2)) -> (ifp p a b1 <-> ifp p a b2) $ = '(syl oreq2a (syl orr aneq2a));
+theorem ifptreq (h: $ G -> (p <-> ifp a p0 p1) $)
+  (h0: $ G /\ a -> (p0 <-> q0) $) (h1: $ G /\ ~a -> (p1 <-> q1) $):
+  $ G -> (p <-> ifp a q0 q1) $ = '(bitrd h (oreqid (aneq2da h0) (aneq2da h1)));
+theorem ifppos2: $ b -> (ifp a b c <-> a \/ c) $ = '(syl6bb (ax_mp oreq2a bian1) (oreqid bian2 biidd));
+theorem ifppos3: $ c -> (ifp a b c <-> ~a \/ b) $ = '(syl5bb (bicomi ifpnot) ifppos2);
+theorem ifpneg3: $ ~c -> (ifp a b c <-> a /\ b) $ = '(syl bior2 (con3i anr));
+theorem ifpneg2: $ ~b -> (ifp a b c <-> ~a /\ c) $ = '(syl5bb (bicomi ifpnot) (ifpneg3));
+
+--| The constant `true`.
+term tru: wff; prefix tru: $T.$ prec max;
+--| `true` is true.
+axiom itru: $ T. $;
+--| The constant `false`.
+def fal: wff = $ ~T. $; prefix fal: $F.$ prec max;
+
+theorem trud (h: $ T. -> a $): $ a $ = '(ax_mp h itru);
+theorem eqtru: $ (a <-> T.) <-> a $ = '(ax_mp bibi2 itru);
+theorem notfal: $ ~F. $ = '(ax_mp notnot1 itru);
+theorem efal: $ F. -> a $ = '(ax_mp absurdr itru);
+theorem imfal: $ (a -> F.) <-> ~a $ = '(ax_mp biim2 notfal);
+theorem eqfal: $ (a <-> F.) <-> ~a $ = '(ax_mp bibin2 notfal);
+theorem neqfal: $ (~a <-> F.) <-> a $ = '(bitrii eqfal (bicomi notnot));
