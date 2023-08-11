@@ -458,6 +458,7 @@ theorem ngen (a: wff x) (h: $ ~a $): $ ~E. x a $ = '(ax_mp notnot1 (ax_gen h));
 theorem alex (a: wff x): $ A. x a <-> ~(E. x ~a) $ = '(bitrii (aleqi notnot) notnot);
 theorem exnal (a: wff x): $ E. x ~a <-> ~(A. x a) $ = '(ax_mp con2b alex);
 theorem eal (a: wff x): $ A. x a -> a $ = '(ax_mp ax3 (sylib exnal iex));
+theorem eali (a: wff x) (h: $ A. x a $): $ a $ = '(ax_mp eal h);
 theorem albi (a: wff): $ A. x a <-> a $ = '(ibii eal ax_5);
 theorem exbi (a: wff): $ E. x a <-> a $ = '(ax_mp con1b (bicomi albi));
 theorem alan1 (a: wff) (b: wff x): $ A. x (a /\ b) <-> a /\ A. x b $ = '(bitrii alan (aneq1i albi));
@@ -469,3 +470,121 @@ theorem excom (a: wff x y): $ E. x E. y a -> E. y E. x a $ = '(bi1i excomb);
 theorem nexi (a: wff x) (h: $ ~a $): $ ~E. x a $ = '(ax_mp notnot1 (ax_gen h));
 theorem nexd (a: wff x) (h: $ G -> ~a $): $ G -> ~E. x a $ = '(sylib alnex (iald h));
 theorem exim1 (a: wff) (b: wff x): $ E. x (a -> b) -> (a -> E. x b) $ = '(com12 (eximd mpcom));
+
+def nf {x: nat} (a: wff x): wff = $ A. x (a -> A. x a) $; prefix nf: $F/$ prec 10;
+
+theorem nfv {x: nat} (a: wff): $ F/ x a $ = '(ax_gen ax_5);
+theorem nfi (a: wff x) (h: $ F/ x a $): $ a -> A. x a $ = '(mpi h (com12 eal));
+theorem nfri (a: wff x) (h: $ a -> A. x a $): $ F/ x a $ = '(ax_gen h);
+theorem nfeqi (a b: wff x) (h: $ a <-> b $): $ (F/ x a) <-> (F/ x b) $ = '(aleqi (imeqi h (aleqi h)));
+theorem nfx (a b: wff x) (h1: $ a <-> b $) (h2: $ F/ x b $): $ F/ x a $ = '(ax_mp (bi1i (nfeqi (bicomi h1))) h2);
+theorem nfal (a: wff x y) (h: $ F/ x a $): $ F/ x A. y a $ = '(ax_gen (syl alcom (alimi (eali h))));
+theorem nfnot (a: wff x) (h: $ F/ x a $): $ F/ x ~a $ = '(nfri (ax_mp con1 (syl eal (syl (ax_mp con1 (ax_10)) (eximi (eali h))))));
+theorem nfim (a b: wff x) (h1: $ F/ x a $) (h2: $ F/ x b $): $ F/ x a -> b $ = 
+'(nfri (cases (syl6 (syl (alimi ax1) (eali h2)) mpcom) (a1d (syl (alimi absurd) (eali (nfnot h1))))));
+theorem nfan (a b: wff x) (h1: $ F/ x a $) (h2: $ F/ x b $): $ F/ x a /\ b $ = '(nfnot (nfim h1 (nfnot h2)));
+theorem nfor (a b: wff x) (h1: $ F/ x a $) (h2: $ F/ x b $): $ F/ x a \/ b $ = '(nfim (nfnot h1) h2);
+theorem nfbi (a b: wff x) (h1: $ F/ x a $) (h2: $ F/ x b $): $ F/ x a <-> b $ = '(nfan (nfim h1 h2) (nfim h2 h1));
+theorem nfex1 (a: wff x): $ F/ x E. x a $ = '(ax_gen ax_10); 
+theorem nfex (a: wff x y) (h: $ F/ x a $): $ F/ x E. y a $ = '(nfnot (nfal (nfnot h)));
+theorem nfal1 (a: wff x): $ F/ x A. x a $ = '(nfx alex (nfnot nfex1));
+
+theorem ialdh (a b: wff x) (h1: $ F/ x a $) (h2: $ a -> b $): $ a -> A. x b $ = '(syl (alimi h2) (eali h1));
+theorem eexh (a b: wff x) (h1: $ F/ x b $) (h2: $ a -> b $): $ E. x a -> b $ = '(con1i (ialdh (nfnot h1) (con3i h2)));
+theorem eexdh (a b c: wff x) (h1: $ F/ x a $) (h2: $ F/ x c $) (h3: $ a -> b -> c $): $ a -> E. x b -> c $ = 
+'(con1d (syl5 (eali (nfnot h2)) (syl (al2imi (con3d h3)) (eali h1))));
+theorem alimdh (a b c: wff x) (h1: $ F/ x a $) (h2: $ a -> b -> c $): $ a -> A. x b -> A. x c $ = '(syl (al2imi h2) (eali h1));
+theorem aleqdh (G a b: wff x) (h1: $ F/ x G $) (h: $ G -> (a <-> b) $): $ G -> (A. x a <-> A. x b) $ = '(syl aleq (ialdh h1 h));
+theorem eexd (a: wff) (b: wff x) (c: wff) (h: $ a -> b -> c $): $ a -> E. x b -> c $ = '(eexdh nfv nfv h);
+theorem eexda (a: wff) (b: wff x) (c: wff) (h: $ a /\ b -> c $): $ a -> E. x b -> c $ = '(eexd (exp h));
+theorem eexb (a: wff x) (b: wff): $ (E. x a -> b) <-> A. x (a -> b) $ = 
+'(ibii (ialdh (nfim nfex1 nfv) (imim1i iex)) (eexdh nfal1 nfv eal));
+theorem alexb (a b: wff x) (c: wff): $ (A. x ((a /\ b) -> c)) <-> A. x (a -> b -> c) $ = '(aleqi impexp);
+theorem erexb (a b: wff x) (c: wff): $ (E. x (a /\ b) -> c) <-> A. x (a -> b -> c) $ = '(bitrii eexb alexb);
+theorem iexeh (a: nat) (b c: wff x) (h: $ F/ x c $) (e: $ x = a -> (b <-> c) $): $ c -> E. x b $ = 
+'(mpi (! ax_6 a) (syl exim (syl (alimi (com12 (bi2d e))) (eali h))));
+theorem iexeh1 (a: nat) (b c: wff x) (h: $ F/ x c $) (e: $ x = a -> (c -> b) $): $ c -> E. x b $ = 
+'(mpi (! ax_6 a) (syl exim (syl (alimi (com12 e)) (eali h))));
+theorem ealeh (a: nat) (b c: wff x) (h: $ F/ x c $) (e: $ x = a -> (b <-> c) $): $ A. x b -> c $ = 
+'(syl (ax_mp con1 (iexeh (nfnot h) (noteqd e))) (bi1i alex));
+theorem alim1 (a: wff) (b: wff x): $ A. x (a -> b) <-> a -> A. x b $ = 
+'(ibii (syl5 ax_5 ax_4) (syl (alimi (imim2i eal)) (nfi (nfim nfv nfal1))));
+theorem ralim1 (a: wff) (p b: wff x): $ A. x (p -> a -> b) <-> a -> A. x (p -> b) $ = '(bitrii (aleqi com12b) alim1);
+theorem ralalcomb (p: wff x) (a: wff x y): $ A. x (p -> A. y a) <-> A. y A. x (p -> a) $ = 
+'(bitrii (aleqi (bicomi alim1)) alcomb);
+theorem ralcomb (p: wff x) (q: wff y) (a: wff x y): $ A. x (p -> A. y (q -> a)) <-> A. y (q -> A. x (p -> a)) $ = 
+'(bitrii ralalcomb (aleqi ralim1));
+theorem exal (a: wff x y): $ E. x A. y a -> A. y E. x a $ = '(eexh (nfal nfex1) (alimi iex));
+theorem exral (a: wff y) (b: wff x y): $ E. x A. y (a -> b) -> A. y (a -> E. x b) $ = 
+'(syl (alimi (com12 (eximd mpcom))) exal);
+theorem rexal (a: wff x) (b: wff x y): $ E. x (a /\ A. y b) -> A. y E. x (a /\ b) $ = '(sylbir (exeqi alan1) exal);
+theorem rexim1 (a c: wff x): $ E. x (a /\ (b -> c)) -> b -> E. x (a /\ c) $ = '(com12 (con3d (alimd (con3d (anim2d mpcom)))));
+theorem rexral (a: wff x) (b: wff y) (c: wff x y): $ E. x (a /\ A. y (b -> c)) -> A. y (b -> E. x (a /\ c)) $ = 
+'(syl exral (eximi (imp_and (alimd (exp imancom)))));
+theorem eqerd {x: nat} (h: $ G -> a = x -> p $): $ G -> p $ = '(mpi ax_6 (eexd (syl5 eqcom h)));
+theorem eale (a: nat) (b: wff x) (c: wff) (e: $ x = a -> (b <-> c) $): $ A. x b -> c $ = '(ealeh nfv e);
+theorem iexdeh (a: nat) (G b: wff x) (h: $ F/ x G $) (e: $ G /\ x = a -> b $): $ G -> E. x b $ = 
+'(mpi ax_6 (syl exim (ialdh h (exp e))));
+theorem iexde (G: wff) (a: nat) (b: wff x) (e: $ G /\ x = a -> b $): $ G -> E. x b $ = '(iexdeh nfv e);
+theorem iexdde (G b) (a: nat) (c: wff x) (e: $ G /\ x = a -> b -> c $): $ G -> b -> E. x c $ = 
+'(exp (iexde (imp_and (imp_and (com23 (exp e))))));
+theorem iexie (a: nat) (b: wff x) (e: $ x = a -> b $): $ E. x b $ = '(ax_mp (iexde (imp_and (a1i e))) itru);
+theorem iexe (a: nat) (b: wff x) (c: wff) (e: $ x = a -> (b <-> c) $): $ c -> E. x b $ = '(iexde (imp_and (com12 (bi2d e))));
+theorem ealdeh (a: nat) (G b c: wff x) (h1: $ F/ x G $) (h2: $ F/ x c $) (e: $ G /\ x = a -> b -> c $): $ G -> A. x b -> c $ = 
+'(syl (com12 (eexdh nfal1 h2 (syl mpcom eal))) (iexdeh h1 e));
+theorem ealieh (a: nat) (b: wff x) (h: $ F/ x c $) (e: $ x = a -> b -> c $): $ A. x b -> c $ = 
+'(syl (ax_mp con1 (iexeh1 (nfnot h) (con3d e))) (bi1i alex));
+theorem ealde (G c: wff) (a: nat) (b: wff x) (e: $ G /\ x = a -> b -> c $): $ G -> A. x b -> c $ = 
+'(com12 (ealieh (nfim nfv nfv) (com23 (com12 (exp e)))));
+theorem ealie (a: nat) (b: wff x) (c: wff) (e: $ x = a -> b -> c $): $ A. x b -> c $ = '(ealieh nfv e);
+theorem exan1 (a: wff) (b: wff x): $ E. x (a /\ b) <-> a /\ E. x b $ = '(ibii (iand (eex anl) (eximi anr)) (imp_and (eximd ian)));
+theorem exan2 (a: wff x) (b: wff): $ E. x (a /\ b) <-> E. x a /\ b $ = '(bitrii (exeqi ancomb) (bitrii exan1 ancomb));
+theorem bian1exi (a c: wff x) (h: $ a <-> b /\ c $): $ E. x a <-> b /\ E. x c $ = '(bitrii (exeqi h) exan1);
+theorem bian2exi (a b: wff x) (h: $ a <-> b /\ c $): $ E. x a <-> E. x b /\ c $ = '(bitrii (bian1exi (bitrii h ancomb)) ancomb);
+theorem bian1exd (a c: wff x) (h: $ G -> (a <-> b /\ c) $): $ G -> (E. x a <-> b /\ E. x c) $ = '(bitrd (exeqd h) (a1i exan1));
+theorem bian2exd (a b: wff x) (h: $ G -> (a <-> b /\ c) $): $ G -> (E. x a <-> E. x b /\ c) $ = '(bitrd (exeqd h) (a1i exan2));
+theorem biexexi (a b: wff x y) (h: $ a <-> E. y b $): $ E. x a <-> E. y E. x b $ = '(bitrii (exeqi h) excomb);
+theorem biexan1a (a b: wff x) (h: $ c -> (a <-> E. x b) $): $ a /\ c <-> E. x (b /\ c) $ = 
+'(bitrii (ax_mp aneq1a h) (bicomi exan2));
+theorem biexan2a (b c: wff x) (h: $ a -> (b <-> E. x c) $): $ a /\ b <-> E. x (a /\ c) $ = 
+'(bitrii ancomb (bitrii (biexan1a h) (exeqi ancomb)));
+theorem biexan1i (a b: wff x) (h: $ a <-> E. x b $): $ a /\ c <-> E. x (b /\ c) $ = '(biexan1a (a1i h));
+theorem biexan2i (b c: wff x) (h: $ b <-> E. x c $): $ a /\ b <-> E. x (a /\ c) $ = '(biexan2a (a1i h));
+theorem rexexcomb (p: wff x) (a: wff x y): $ E. x (p /\ E. y a) <-> E. y E. x (p /\ a) $ = '(biexexi (bicomi exan1));
+theorem birexexi (a b: wff x y) (q: wff y) (h: $ a <-> E. y (q /\ b) $): $ E. x a <-> E. y (q /\ E. x b) $ = 
+'(bitrii (exeqi h) (bicomi rexexcomb));
+theorem biexrexa (p: wff x) (a b: wff x y) (h: $ p -> (a <-> E. y b) $): $ E. x (p /\ a) <-> E. y E. x (p /\ b) $ = 
+'(bitrii (exeqi (ax_mp aneq2a h)) rexexcomb);
+theorem biexrexi (p: wff x) (a b: wff x y) (h: $ a <-> E. y b $): $ E. x (p /\ a) <-> E. y E. x (p /\ b) $ = '(biexrexa (a1i h));
+theorem rexcomb (p: wff x) (q: wff y) (a: wff x y): $ E. x (p /\ E. y (q /\ a)) <-> E. y (q /\ E. x (p /\ a)) $ = 
+'(bitrii rexexcomb (exeqi (bitrii (exeqi anlass) exan1)));
+theorem birexan1a (p a b: wff x) (h: $ c -> (a <-> E. x (p /\ b)) $): $ a /\ c <-> E. x (p /\ (b /\ c)) $ = 
+'(bitrii (ax_mp aneq1a h) (bitrii (bicomi exan2) (exeqi anass)));
+theorem birexan2a (p a b: wff x) (h: $ c -> (a <-> E. x (p /\ b)) $): $ a /\ c <-> E. x (p /\ (c /\ b)) $ = 
+'(bitrii (birexan1a h) (exeqi (aneq2i ancomb)));
+theorem birexrexa (q: wff y) (p: wff x) (a b: wff x y) (h: $ p -> (a <-> E. y (q /\ b)) $): 
+$ E. x (p /\ a) <-> E. y (q /\ E. x (p /\ b)) $ = '(bitrii (exeqi (bitrii ancomb (birexan2a h))) (bicomi rexexcomb));
+theorem birexan1i (p a b: wff x) (h: $ a <-> E. x (p /\ b) $): $ a /\ c <-> E. x (p /\ (b /\ c)) $ = '(birexan1a (a1i h));
+theorem birexan2i (p a b: wff x) (h: $ a <-> E. x (p /\ b) $): $ a /\ c <-> E. x (p /\ (c /\ b)) $ = '(birexan2a (a1i h));
+theorem birexrexi (q: wff y) (p: wff x) (a b: wff x y) (h: $ a <-> E. y (q /\ b) $): 
+$ E. x (p /\ a) <-> E. y (q /\ E. x (p /\ b)) $ = '(birexrexa (a1i h));
+theorem rexan1 (a: wff) (p b: wff x): $ E. x (p /\ (a /\ b)) <-> a /\ E. x (p /\ b) $ = '(bitrii (exeqi anlass) exan1);
+theorem rexan2 (p a: wff x) (b: wff): $ E. x (p /\ (a /\ b)) <-> E. x (p /\ a) /\ b $ = '(bitrii (exeqi (bicomi anass)) exan2);
+theorem bian1rexa (p a c: wff x) (h: $ p -> (a <-> b /\ c) $): $ E. x (p /\ a) <-> b /\ E. x (p /\ c) $ = 
+'(bitrii (exeqi (bitrii (ax_mp aneq2a h) anlass)) exan1);
+theorem bian2rexa (p a b: wff x) (h: $ p -> (a <-> b /\ c) $): $ E. x (p /\ a) <-> E. x (p /\ b) /\ c $ = 
+'(bitrii (exeqi (ax_mp aneq2a h)) (bitrii (exeqi (bicomi anass)) exan2));
+theorem bian1rexi (p a c: wff x) (h: $ a <-> b /\ c $): $ E. x (p /\ a) <-> b /\ E. x (p /\ c) $ = '(bian1rexa (a1i h));
+theorem bian2rexi (p a b: wff x) (h: $ a <-> b /\ c $): $ E. x (p /\ a) <-> E. x (p /\ b) /\ c $ = '(bian2rexa (a1i h));
+theorem alexan (a b: wff x): $ A. x a -> E. x b -> E. x (a /\ b) $ = '(syl exim (alimi ian));
+theorem exifp (a b: wff x): $ E. x ifp p a b <-> ifp p (E. x a) (E. x b) $ = 
+'(bitrii exor (oreqi exan1 exan1));
+
+theorem cbvalh (p q: wff x y) (h1: $ F/ y p $) (h2: $ F/ x q $) (e: $ x = y -> (p <-> q) $): $ A. x p <-> A. y q $ = 
+'(ibii (ialdh (nfal h1) (ealeh h2 e)) (ialdh (nfal h2) (ealeh h1 (syl (bicomd e) eqcom))));
+theorem cbval (p: wff x) (q: wff y) (e: $ x = y -> (p <-> q) $): $ A. x p <-> A. y q $ = '(cbvalh nfv nfv e);
+
+theorem cbvexh (p q: wff x y) (h1: $ F/ y p $) (h2: $ F/ x q $) (e: $ x = y -> (p <-> q) $): $ E. x p <-> E. y q $ = 
+'(ax_mp con3b (cbvalh (nfnot h1) (nfnot h2) (noteqd e)));
+theorem cbvex (p: wff x) (q: wff y) (e: $ x = y -> (p <-> q) $): $ E. x p <-> E. y q $ = '(cbvexh nfv nfv e);
+
