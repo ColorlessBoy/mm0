@@ -588,3 +588,56 @@ theorem cbvexh (p q: wff x y) (h1: $ F/ y p $) (h2: $ F/ x q $) (e: $ x = y -> (
 '(ax_mp con3b (cbvalh (nfnot h1) (nfnot h2) (noteqd e)));
 theorem cbvex (p: wff x) (q: wff y) (e: $ x = y -> (p <-> q) $): $ E. x p <-> E. y q $ = '(cbvexh nfv nfv e);
 
+--| Not sure what to call this, let's say "positive implication".
+--| It quantifies both `p` and `q` and asserts that `p` implies `q`, but not vacuously.
+local def pim {x: nat} (p q: wff x): wff = $ E. x p /\ A. x (p -> q) $;
+-- uses a low prec to require parens, since the binding is not obvious
+notation pim {x} (p q) = ($P.$:10) x p ($->$:25) q;
+
+theorem pimex (p q: wff x): $ (P. x p -> q) -> E. x p $ = '(anl);
+theorem pimal (p q: wff x): $ (P. x p -> q) -> A. x (p -> q) $ = '(anr);
+theorem pimex2 (p q: wff x): $ (P. x p -> q) -> E. x q $ = '(impcom exim);
+theorem pimex12 (p q: wff x): $ (P. x p -> q) -> E. x (p /\ q) $ = '(impcom (syl exim (alimi (a2i ian))));
+theorem pimeq: $ (P. x p -> q) -> A. x (p -> q) $ = '(pimal);
+theorem pimeq1 (p1 p2 q: wff x): $ A. x (p1 <-> p2) -> ((P. x p1 -> q) <-> (P. x p2 -> q)) $ = 
+'(aneqd exeq (syl aleq (alimi (imeq1d id))));
+theorem pimim2 (p q1 q2: wff x): $ A. x (q1 -> q2) -> (P. x p -> q1) -> (P. x p -> q2) $ = '(animd (a1i id) (al2imi imim2));
+theorem pimim2i (p q1 q2: wff x) (h: $ q1 -> q2 $): $ (P. x p -> q1) -> (P. x p -> q2) $ = '(ax_mp pimim2 (ax_gen h));
+theorem pimim2d (p q1 q2: wff x) (h: $ G -> q1 -> q2 $): $ G -> (P. x p -> q1) -> (P. x p -> q2) $ = '(syl pimim2 (ialdh nfv h));
+theorem pimeq2a (p q1 q2: wff x): $ A. x (p -> (q1 <-> q2)) -> ((P. x p -> q1) <-> (P. x p -> q2)) $ = 
+'(aneqd (a1i biid) (syl aleq (alimi imeq2a)));
+theorem pimeq2 (p q1 q2: wff x): $ A. x (q1 <-> q2) -> ((P. x p -> q1) <-> (P. x p -> q2)) $ = 
+'(ibid (syl (pimim2) (alimi bi1)) (syl pimim2 (alimi bi2)));
+theorem pimeq1d (G: wff) {x: nat} (p1 p2 q: wff x) (h1: $ G -> (p1 <-> p2) $): $ G -> ((P. x p1 -> q) <-> (P. x p2 -> q)) $ = 
+'(syl pimeq1 (ialdh nfv h1));
+theorem pimeq2d (G: wff) {x: nat} (p q1 q2: wff x) (h1: $ G -> (q1 <-> q2) $): $ G -> ((P. x p -> q1) <-> (P. x p -> q2)) $ = 
+'(syl pimeq2 (ialdh nfv h1));
+theorem pimeq1i {x: nat} (p1 p2 q: wff x) (h1: $ p1 <-> p2 $): $ (P. x p1 -> q) <-> (P. x p2 -> q) $ = '(ax_mp pimeq1 (ax_gen h1));
+theorem pimeq2i {x: nat} (p q1 q2: wff x) (h1: $ q1 <-> q2 $): $ (P. x p -> q1) <-> (P. x p -> q2) $ = '(ax_mp pimeq2 (ax_gen h1));
+theorem pimeqd (G: wff) {x: nat} (p1 p2 q1 q2: wff x) (h1: $ G -> (p1 <-> p2) $) (h2: $ G -> (q1 <-> q2) $): 
+$ G -> ((P. x p1 -> q1) <-> (P. x p2 -> q2)) $ = '(bitrd (pimeq1d h1) (pimeq2d h2));
+
+theorem cbvpimh (p1 p2 q1 q2: wff x y)
+  (h1: $ F/ y p1 $) (h2: $ F/ y q1 $) (h3: $ F/ x p2 $) (h4: $ F/ x q2 $)
+  (e1: $ x = y -> (p1 <-> p2) $) (e2: $ x = y -> (q1 <-> q2) $):
+  $ (P. x p1 -> q1) <-> (P. y p2 -> q2) $ = '(aneqii (cbvexh h1 h3 e1) (cbvalh (nfim h1 h2) (nfim h3 h4) (imeqd e1 e2)));
+theorem cbvpim (p1 q1: wff x) (p2 q2: wff y)
+  (e1: $ x = y -> (p1 <-> p2) $) (e2: $ x = y -> (q1 <-> q2) $):
+  $ (P. x p1 -> q1) <-> (P. y p2 -> q2) $ = '(cbvpimh nfv nfv nfv nfv e1 e2);
+
+theorem piman (a b c: wff x): $ (P. x a -> b) /\ (P. x a -> c) -> (P. x a -> b /\ c) $ = 
+'(imp_and (syl (anim2d (al2imi (exp and_ax2r))) pimal));
+theorem impim (a c: wff x): $ (P. x a -> b -> c) -> b -> (P. x a -> c) $ = '(com12 (anim2d (alimd (com12 (com23 id)))));
+theorem expim (p: wff x) (q: wff x y): $ E. y (P. x p -> q) -> (P. x p -> E. y q) $ = 
+'(iand (syl anl (bi1i exan1)) (syl exral (eximi anr)));
+theorem rexpim (a: wff y) (p: wff x) (q: wff x y): $ E. y (a /\ (P. x p -> q)) -> (P. x p -> E. y (a /\ q)) $ = 
+'(syl expim (eximi (bi2a (pimeq2d bian1))));
+theorem rexpim1 (a: wff x) (b: wff y) (c: wff x y): $ E. x (a /\ (P. y b -> c)) -> (P. y b -> E. x (a /\ c)) $ = '(rexpim);
+theorem pim2im (p1 q1: wff x) (p2 q2: wff y): $ A. x (p1 -> (P. y p2 -> q1 -> q2)) -> (P. x p1 -> q1) -> (P. y p2 -> q2) $ = 
+'(impd (com23 (syl6ibr (eexb) (al2imi (a2d (imim2i impim))))));
+theorem pimtr (p: wff x) (q a: wff x y) (b: wff y): $ (P. x p -> a) -> A. x (a -> (P. y q -> b)) -> (P. y E. x (p /\ q) -> b) $ = 
+'(exp (iand 
+  (syl excom (impcom (syl5 pimex12 (syl exim (alimi (impd (com12 (imim2d (syl5 anl (eximd ian)))))))))) 
+  (syl (sylibr (aleqi (bitrii eexb (aleqi impexp))) (sylib ralalcomb (imp_and (al2imi (com12 (imim2)))))) 
+       (animii anr (alimi (imim2i anr))))));
+
