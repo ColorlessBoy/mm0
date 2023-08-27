@@ -718,3 +718,214 @@ theorem pimexeqed (a: nat) (p: wff x y) (q: wff x) (p2 q2: wff y)
   aneqd (syl5bb excomb (exeqd (exeqed e1))) 
   (syl5bb (aleqi eexb) (syl5bb alcomb (aleqd (syl5bb (aleqi impexp) (aleqed (imeqd e1 e2))))))
 );
+
+--set
+strict sort set;
+--| A "class abstraction" `{x | p(x)}` is the set of natural numbers `x` such that `p(x)` holds.
+term ab {x: nat} (p: wff x): set;
+notation ab {x: nat} (p: wff x): set = (${$:max) x ($|$:0) p ($}$:0);
+
+--| Given a natural number `a` and a set `A`, `a e. A` (read `e.` as epsilon)
+--| means `a` is in the set `A`.
+term el (a: nat) (A: set): wff; infixl el: $e.$ prec 50;
+
+--| `a` is in `{x | p(x)}` iff `p(a)` holds.
+axiom elab (a: nat) {x: nat} (p: wff x): $ a e. {x | p} <-> [a / x] p $;
+
+--| Elementhood respects equality. This is a theorem for most definitions
+--| but has to be axiomatized for primitive term constructors like `e.`
+--| This is Axiom 8 of predicate logic (which has an instance for every
+--| primitive predicate in the language).
+axiom ax_8 (a b: nat) (A: set): $ a = b -> a e. A -> b e. A $;
+
+--| `A == B` is equality for sets. Two sets are equal if they have the
+--| same elements.
+def eqs (A B: set) {.x: nat}: wff = $ A. x (x e. A <-> x e. B) $;
+infixl eqs: $==$ prec 50;
+
+theorem eqsid: $ A == A $ = '(!! ax_gen x biid);
+theorem eqscom: $ A == B -> B == A $ = '(!! alimi x bicom);
+theorem eqscomb: $ A == B <-> B == A $ = '(!! aleqi x bicomb);
+theorem eqstr: $ A == B -> B == C -> A == C $ = '(!! al2imi x bitr);
+theorem eqstr2: $ A == B -> B == C -> C == A $ = '(!! al2imi x bitr2);
+theorem eqstr3: $ B == A -> B == C -> A == C $ = '(!! al2imi x bitr3);
+theorem eqstr4: $ A == B -> C == B -> A == C $ = '(!! al2imi x bitr4);
+theorem eqstr3d (h1: $ G -> B == A $) (h2: $ G -> B == C $): $ G -> A == C $ = '(sylc eqstr3 h1 h2);
+theorem eqsidd (G A): $ G -> A == A $ = '(a1i eqsid);
+theorem eqscomd (h: $ G -> A == B $): $ G -> B == A $ = '(syl eqscom h);
+theorem eqstrd (h1: $ G -> A == B $) (h2: $ G -> B == C $): $ G -> A == C $ = '(sylc eqstr h1 h2);
+theorem eqstr4d (h1: $ G -> A == B $) (h2: $ G -> C == B $): $ G -> A == C $ = '(sylc eqstr4 h1 h2);
+theorem syl5eqs (h1: $ A == B $) (h2: $ G -> B == C $): $ G -> A == C $ = '(eqstrd (a1i h1) h2);
+theorem syl5eqsr (h1: $ B == A $) (h2: $ G -> B == C $): $ G -> A == C $ = '(syl5eqs (ax_mp eqscom h1) h2);
+theorem syl6eqs (h1: $ B == C $) (h2: $ G -> A == B $): $ G -> A == C $ = '(sylc eqstr h2 (a1i h1));
+theorem syl6eqsr (h1: $ C == B $) (h2: $ G -> A == B $): $ G -> A == C $ = '(syl6eqs (ax_mp eqscom h1) h2);
+theorem eqstr3g (h1: $ A == C $) (h2: $ B == D $) (h: $ G -> A == B $): $ G -> C == D $ = '(syl6eqs h2 (syl5eqsr h1 h));
+theorem eqstr4g (h1: $ C == A $) (h2: $ D == B $) (h: $ G -> A == B $): $ G -> C == D $ = '(eqstr3g (ax_mp eqscom h1) (ax_mp eqscom h2) h);
+
+theorem eleq1: $ a = b -> (a e. A <-> b e. A) $ = '(ibid ax_8 (syl ax_8 eqcom));
+theorem eleq2: $ A == B -> (a e. A <-> a e. B) $ = '(!! eale x (bieqd eleq1 eleq1));
+theorem eleq1d (h: $ G -> a = b $): $ G -> (a e. A <-> b e. A) $ = '();
+theorem eleq2d (h: $ G -> A == B $): $ G -> (a e. A <-> a e. B) $ = '();
+theorem eleqd (G a b A B) (h1: $ G -> a = b $) (h2: $ G -> A == B $): $ G -> (a e. A <-> b e. B) $ = '();
+
+theorem abeq (p q: wff x): $ A. x (p <-> q) -> {x | p} == {x | q} $ = '();
+theorem abeqd (G) {x} (p q: wff x) (h: $ G -> (p <-> q) $): $ G -> {x | p} == {x | q} $ = '();
+theorem abeqi (p q: wff x) (h: $ p <-> q $): $ {x | p} == {x | q} $ = '();
+theorem eqri {x} (h: $ x e. A <-> x e. B $): $ A == B $ = '();
+theorem eqrd (G) {x} (h: $ G -> (x e. A <-> x e. B) $): $ G -> A == B $ = '();
+theorem cbvabh (p q: wff x y) (h1: $ F/ y p $) (h2: $ F/ x q $)
+  (e: $ x = y -> (p <-> q) $): $ {x | p} == {y | q} $ = '();
+theorem cbvab (p: wff x) (q: wff y) (e: $ x = y -> (p <-> q) $): $ {x | p} == {y | q} $ = '();
+theorem cbvabs (p: wff x): $ {x | p} == {y | [y / x] p} $ = '();
+theorem cbvabd (G) (p: wff x) (q: wff y) (h: $ G /\ x = y -> (p <-> q) $): $ G -> {x | p} == {y | q} $ = '();
+theorem elab2 (a: nat x) (p: wff x): $ a e. {x | p} <-> [a / x] p $ = '();
+theorem elabe (a: nat) (p: wff x) (q: wff) (e: $ x = a -> (p <-> q) $): $ a e. {x | p} <-> q $ = '();
+theorem elabed (a: nat) (p: wff x) (q: wff) (e: $ G /\ x = a -> (p <-> q) $): $ G -> (a e. {x | p} <-> q) $ = '();
+theorem ssabed (a: nat) (p: wff x) (q: wff) (h: $ G /\ x = a -> p -> q $): $ G -> a e. {x | p} -> q $ = '();
+theorem eelabd (a: nat x) (p: wff x) (q: wff) (h: $ G -> p -> q $): $ G -> a e. {x | p} -> q $ = '();
+theorem ssabeled (a: nat) (p: wff x) (q: wff)
+  (h: $ G /\ x = a -> p -> q /\ x e. A $): $ G -> a e. {x | p} -> q /\ a e. A $ = '();
+theorem abid (p: wff x): $ x e. {x | p} <-> p $ = '();
+theorem abid2: $ {x | x e. A} == A $ = '();
+
+--| `A C_ B` means `A` is a subset of `B`.
+def subset (A B: set): wff = $ A. x (x e. A -> x e. B) $; infixl subset: $C_$ prec 50;
+
+theorem dfss: $ A C_ B <-> A. x (x e. A -> x e. B) $ = '();
+theorem ssel: $ A C_ B -> a e. A -> a e. B $ = '();
+theorem sseld (h1: $ G -> A C_ B $) (h2: $ G -> a e. A $): $ G -> a e. B $ = '();
+theorem ssid: $ A C_ A $ = '();
+theorem sstr: $ A C_ B -> B C_ C -> A C_ C $ = '();
+theorem eqss: $ A == B -> A C_ B $ = '();
+theorem eqssr: $ A == B -> B C_ A $ = '();
+theorem ssasym: $ A C_ B -> B C_ A -> A == B $ = '();
+theorem ssasymd (h1: $ G -> A C_ B $) (h2: $ G -> B C_ A $): $ G -> A == B $ = '();
+theorem ssasymb: $ A == B <-> A C_ B /\ B C_ A $ = '();
+
+--| `A i^i B` is the intersection of sets `A` and `B`.
+def Inter (A B: set): set = $ {x | x e. A /\ x e. B} $; infixl Inter: $i^i$ prec 70;
+
+theorem elin: $ a e. A i^i B <-> a e. A /\ a e. B $ = '();
+theorem incom: $ A i^i B == B i^i A $ = '();
+theorem inass: $ (A i^i B) i^i C == A i^i (B i^i C) $ = '();
+theorem inss1: $ A i^i B C_ A $ = '();
+theorem inss2: $ A i^i B C_ B $ = '();
+theorem ssin: $ A C_ B i^i C <-> A C_ B /\ A C_ C $ = '();
+theorem ssin1: $ A C_ B -> A i^i C C_ B i^i C $ = '();
+theorem ssin2: $ B C_ C -> A i^i B C_ A i^i C $ = '();
+theorem eqin1: $ A C_ B <-> A i^i B == A $ = '();
+theorem eqin2: $ A C_ B <-> B i^i A == A $ = '();
+
+--| `A u. B` is the union of sets `A` and `B`.
+def Union (A B: set): set = $ {x | x e. A \/ x e. B} $; infixl Union: $u.$ prec 64;
+
+theorem elun: $ a e. A u. B <-> a e. A \/ a e. B $ = '();
+theorem uncom: $ A u. B == B u. A $ = '();
+theorem unass: $ (A u. B) u. C == A u. (B u. C) $ = '();
+theorem indi: $ A i^i (B u. C) == (A i^i B) u. (A i^i C) $ = '();
+theorem indir: $ (A u. B) i^i C == (A i^i C) u. (B i^i C) $ = '();
+theorem inindi: $ A i^i (B i^i C) == (A i^i B) i^i (A i^i C) $ = '();
+theorem undi: $ A u. (B i^i C) == (A u. B) i^i (A u. C) $ = '();
+theorem undir: $ (A i^i B) u. C == (A u. C) i^i (B u. C) $ = '();
+theorem ssun1: $ A C_ A u. B $ = '();
+theorem ssun2: $ B C_ A u. B $ = '();
+theorem elun1: $ a e. A -> a e. A u. B $ = '();
+theorem elun2: $ a e. B -> a e. A u. B $ = '();
+theorem unss: $ A u. B C_ C <-> A C_ C /\ B C_ C $ = '();
+theorem unss1: $ A C_ B -> A u. C C_ B u. C $ = '();
+theorem unss2: $ B C_ C -> A u. B C_ A u. C $ = '();
+theorem equn1: $ A C_ B <-> A u. B == B $ = '();
+theorem equn2: $ A C_ B <-> B u. A == B $ = '();
+
+--| `Compl A` is the complement of `A`, the set of all elements not in `A`.
+def Compl (A: set): set = $ {x | ~x e. A} $;
+
+theorem elcpl: $ a e. Compl A <-> ~a e. A $ = '();
+theorem sscpl: $ B C_ A <-> Compl A C_ Compl B $ = '();
+theorem cplcpl: $ Compl (Compl A) == A $ = '();
+theorem cplinj: $ A == B <-> Compl A == Compl B $ = '();
+theorem cplin: $ Compl (A i^i B) == Compl A u. Compl B $ = '();
+theorem cplun: $ Compl (A u. B) == Compl A i^i Compl B $ = '();
+
+--| `Univ`, or `_V` is the set of all natural numbers.
+def Univ: set = $ {x | T.} $; prefix Univ: $_V$ prec max;
+
+theorem elv: $ a e. _V $ = '();
+theorem inv1: $ _V i^i A == A $ = '();
+theorem inv2: $ A i^i _V == A $ = '();
+theorem uncpl2: $ A u. Compl A == _V $ = '();
+theorem uncpl1: $ Compl A u. A == _V $ = '();
+theorem ssv2: $ A C_ _V $ = '();
+theorem ssv1: $ _V C_ A <-> A == _V $ = '();
+
+local def nfs {x: nat} (A: set x): wff = $ A. y (F/ x y e. A) $; prefix nfs: $FS/$ prec 10;
+local def nfn {x: nat} (a: nat x): wff = $ A. y (F/ x y = a) $; prefix nfn: $FN/$ prec 10;
+
+theorem nfsbid (G) {x} (A B: set x) (h: $ G -> A == B $): $ G -> ((FS/ x A) <-> (FS/ x B)) $ = '();
+theorem nfnbid (G) {x} (a b: nat x) (h: $ G -> a = b $): $ G -> ((FN/ x a) <-> (FN/ x b)) $ = '();
+theorem nfsv: $ FS/ x A $ = '();
+theorem nfnv: $ FN/ x a $ = '();
+theorem nfsri {x y} (A: set x) (h: $ F/ x y e. A $): $ FS/ x A $ = '();
+theorem nfnri {x y} (a: nat x) (h: $ F/ x y = a $): $ FN/ x a $ = '();
+theorem nfel2 (a: nat) (A: set x) (h: $ FS/ x A $): $ F/ x a e. A $ = '();
+theorem nfsx (A B: set x) (h1: $ A == B $) (h2: $ FS/ x B $): $ FS/ x A $ = '();
+theorem nf_eq (a b: nat x) (h1: $ FN/ x a $) (h2: $ FN/ x b $): $ F/ x a = b $ = '();
+theorem nfeq2 (b: nat x) (h: $ FN/ x b $): $ F/ x a = b $ = '();
+theorem nfsb1h (a: nat x) (b: wff x) (h: $ FN/ x a $): $ F/ x [a / x] b $ = '();
+theorem nfsbh (a: nat x y) (b: wff x y) (h1: $ FN/ x a $) (h2: $ F/ x b $): $ F/ x [a / y] b $ = '();
+theorem nfel (a: nat x) (A: set x) (h1: $ FN/ x a $) (h2: $ FS/ x A $): $ F/ x a e. A $ = '();
+theorem nfab1 (p: wff x): $ FS/ x {x | p} $ = '();
+theorem nfab (p: wff x y) (h: $ F/ x p $): $ FS/ x {y | p} $ = '();
+theorem nfeqs (A B: set x) (h1: $ FS/ x A $) (h2: $ FS/ x B $): $ F/ x A == B $ = '();
+theorem nfnx (a b: nat x) (h1: $ a = b $) (h2: $ FN/ x b $): $ FN/ x a $ = '();
+theorem nfin (A B: set x) (h1: $ FS/ x A $) (h2: $ FS/ x B $): $ FS/ x A i^i B $ = '();
+theorem nfss (A B: set x) (h1: $ FS/ x A $) (h2: $ FS/ x B $): $ F/ x A C_ B $ = '();
+
+theorem abeqb (p q: wff x): $ A. x (p <-> q) <-> {x | p} == {x | q} $ = '();
+theorem eqab2d (p: wff x) (h: $ G -> (x e. A <-> p) $): $ G -> A == {x | p} $ = '();
+theorem eqab2i (p: wff x) (h: $ x e. A <-> p $): $ A == {x | p} $ = '();
+theorem eqab1d (p: wff x) (h: $ G -> (p <-> x e. A) $): $ G -> {x | p} == A $ = '();
+theorem eqab1i (p: wff x) (h: $ p <-> x e. A $): $ {x | p} == A $ = '();
+theorem ssab (p q: wff x): $ A. x (p -> q) <-> {x | p} C_ {x | q} $ = '();
+theorem ssabi (p q: wff x) (h: $ p -> q $): $ {x | p} C_ {x | q} $ = '();
+theorem ssabd (p q: wff x) (h: $ G -> p -> q $): $ G -> {x | p} C_ {x | q} $ = '();
+theorem ssab1 (p: wff x): $ A. x (p -> x e. A) <-> {x | p} C_ A $ = '();
+theorem ssab2 (p: wff x): $ A. x (x e. A -> p) <-> A C_ {x | p} $ = '();
+theorem elabed1 (p: wff x) (e: $ G /\ x = a -> (a e. A <-> p) -> P $): $ G -> A == {x | p} -> P $ = '();
+theorem elabed2 (p: wff x) (e: $ G /\ x = a -> (p <-> q) $): $ G -> A == {x | p} -> (a e. A <-> q) $ = '();
+
+--| Substitution for sets. `S[a / x] A` is the set `A` when
+--| free variable `x` is evaluated at `a`.
+def sbs (a: nat) {x .y: nat} (A: set x): set = $ {y | [a / x] y e. A} $;
+notation sbs (a: nat) {x: nat} (A: set x): set = ($S[$:99) a ($/$:0) x ($]$:0) A;
+
+theorem elsbs (a: nat x) (b: nat) (A: set x): $ b e. S[a / x] A <-> [a / x] b e. A $ = '();
+theorem sbsq (a: nat) (A: set x): $ x = a -> A == S[a / x] A $ = '();
+theorem nfsbs1h (a: nat x) (A: set x) (h: $ FN/ x a $): $ FS/ x S[a / x] A $ = '();
+theorem nfsbs1 (a: nat) (A: set x): $ FS/ x S[a / x] A $ = '();
+theorem nfsbsh (a: nat x) (A: set x y) (h1: $ FN/ x a $) (h2: $ FS/ x A $): $ FS/ x S[a / y] A $ = '();
+theorem nfsbs (a: nat) (A: set x y) (h: $ FS/ x A $): $ FS/ x S[a / y] A $ = '();
+theorem sbseq1d (G) (a b: nat) (A: set x) (h: $ G -> a = b $): $ G -> S[a / x] A == S[b / x] A $ = '();
+theorem sbseq2d (G) (a: nat x) (A B: set x) (h: $ G -> A == B $): $ G -> S[a / x] A == S[a / x] B $ = '();
+theorem sbseqd (G) {x} (a b: nat) (A B: set x) (h1: $ G -> a = b $) (h2: $ G -> A == B $):
+  $ G -> S[a / x] A == S[b / x] B $ = '();
+theorem sbseht (a: nat) (A B: set x) (h: $ FS/ x B $):
+  $ A. x (x = a -> A == B) -> S[a / x] A == B $ = '();
+theorem sbsco (a: nat) (A: set x): $ S[a / y] S[y / x] A == S[a / x] A $ = '();
+theorem sbseh (a: nat) (A B: set x) (h: $ FS/ x B $) (e: $ x = a -> A == B $): $ S[a / x] A == B $ = '();
+theorem sbset (a: nat) (A: set x) (B: set): $ A. x (x = a -> A == B) -> S[a / x] A == B $ = '();
+theorem sbse (a: nat) (A: set x) (B: set) (e: $ x = a -> A == B $): $ S[a / x] A == B $ = '();
+theorem sbsed (a: nat) (A: set x) (B: set) (e: $ G /\ x = a -> A == B $): $ G -> S[a / x] A == B $ = '();
+theorem sbsid (A: set x): $ S[x / x] A == A $ = '();
+theorem nfslem {y} (A: set y) (a: nat x) (B: set x) (e: $ y = a -> A == B $) (h: $ FN/ x a $): $ FS/ x B $ = '();
+
+def If (p: wff) (A B: set): set = $ {n | ifp p (n e. A) (n e. B)} $;
+
+theorem Ifpos: $ p -> If p A B == A $ = '();
+theorem Ifneg: $ ~p -> If p A B == B $ = '();
+
+theorem Ifid: $ If p A A == A $ = '();
+theorem Ifeq2a: $ (p -> A == B) -> If p A C == If p B C $ = '();
+theorem Ifeq3a: $ (~p -> B == C) -> If p A B == If p A C $ = '();
+
+def eu {x: nat} (p: wff x): wff = $ E. y A. x (p <-> x = y) $;
